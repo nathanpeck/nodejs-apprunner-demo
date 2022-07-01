@@ -1,0 +1,24 @@
+services:
+  # Launch the Redis used for syncing messages between copies of the client app
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+
+  # The actual application
+  app:
+    depends_on:
+      - redis
+    build: ./app
+    environment:
+      REDIS_ENDPOINT: redis
+    ports:
+      - 3000:3000
+
+  # The integration test suite
+  integ:
+    depends_on:
+      - app
+    build: ./integ
+    environment:
+      APP_URL: http://app:3000
